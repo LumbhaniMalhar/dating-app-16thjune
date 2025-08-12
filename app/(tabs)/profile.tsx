@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import ImageViewing from 'react-native-image-viewing';
 import BrownButton from '@/components/BrownButton';
 import CustomImagePicker from '@/components/CustomImagePicker';
 import { useRouter } from 'expo-router';
@@ -46,11 +47,13 @@ export default function ProfileTab() {
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [isViewerVisible, setIsViewerVisible] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
   
   // Sample profile images
   const [profileImages, setProfileImages] = useState<ProfileImage[]>([
     { id: '1', uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face' },
-    { id: '2', uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face' },
+    { id: '2', uri: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000' },
     { id: '3', uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face' },
     { id: '4', uri: '' },
     { id: '5', uri: '' },
@@ -144,7 +147,7 @@ export default function ProfileTab() {
   };
 
   const handleAddImage = () => {
-    // Find the first empty image slot
+    // Find the first empty image slot to add at the next available position
     const emptyImage = profileImages.find(img => !img.uri);
     if (emptyImage) {
       setSelectedImageId(emptyImage.id);
@@ -344,36 +347,57 @@ export default function ProfileTab() {
           My Photos & Videos
         </Text>
         <View style={styles.imagesGrid}>
-          {profileImages.map((image, index) => (
-            <TouchableOpacity
-              key={image.id}
-              style={styles.imageContainer}
-              onPress={() => image.uri ? handleImagePress(image.id) : handleAddImage()}
-            >
-              {image.uri ? (
-                <View style={styles.imageWrapper}>
-                  <Image source={{ uri: image.uri }} style={styles.gridImage} />
-                  {isEditing && (
-                    <View style={styles.imageOverlay}>
-                      <Ionicons name="camera" size={20} color="white" />
+          {(() => {
+            // Filter out images with empty URIs and get only images with URIs
+            const imagesWithUri = profileImages.filter(img => img.uri);
+            
+            // Create an array of 6 slots
+            const slots = Array.from({ length: 6 }, (_, index) => {
+              if (index < imagesWithUri.length) {
+                // This slot has an image
+                const image = imagesWithUri[index];
+                return (
+                  <TouchableOpacity
+                    key={image.id}
+                    style={styles.imageContainer}
+                    onPress={() => handleImagePress(image.id)}
+                  >
+                    <View style={styles.imageWrapper}>
+                      <Image source={{ uri: image.uri }} style={styles.gridImage} />
+                      {isEditing && (
+                        <View style={styles.imageOverlay}>
+                          <Ionicons name="camera" size={20} color="white" />
+                        </View>
+                      )}
+                      {isEditing && (
+                        <TouchableOpacity
+                          style={styles.removeImageButton}
+                          onPress={() => handleRemoveImage(image.id)}
+                        >
+                          <Ionicons name="close" size={12} color="white" />
+                        </TouchableOpacity>
+                      )}
                     </View>
-                  )}
-                  {isEditing && (
-                    <TouchableOpacity
-                      style={styles.removeImageButton}
-                      onPress={() => handleRemoveImage(image.id)}
-                    >
-                      <Ionicons name="close" size={12} color="white" />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              ) : (
-                <View style={[styles.addImageButton, { backgroundColor: colors.imagePlaceholder }]}>
-                  <Ionicons name="add" size={24} color={colors.textSecondary} />
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
+                  </TouchableOpacity>
+                );
+              } else {
+                // This slot is empty
+                return (
+                  <TouchableOpacity
+                    key={`empty-${index}`}
+                    style={styles.imageContainer}
+                    onPress={handleAddImage}
+                  >
+                    <View style={[styles.addImageButton, { backgroundColor: colors.imagePlaceholder }]}>
+                      <Ionicons name="add" size={24} color={colors.textSecondary} />
+                    </View>
+                  </TouchableOpacity>
+                );
+              }
+            });
+            
+            return slots;
+          })()}
         </View>
         <Text style={[styles.imagesHint, { color: colors.textSecondary }]}>
           Tap to add/replace images
@@ -400,101 +424,177 @@ export default function ProfileTab() {
     </ScrollView>
   );
 
-  const renderViewTab = () => (
-    <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false} contentContainerStyle={styles.viewTabContent}>
-      {/* Main Profile Card */}
-      <View style={[styles.profileCard, { backgroundColor: colors.profileCard }]}>
-        {/* Main Image */}
-        <View style={styles.mainImageContainer}>
-          {profileImages[0]?.uri ? (
-            <Image 
-              source={{ uri: profileImages[0].uri }} 
-              style={styles.mainImage} 
-            />
-          ) : (
-            <View style={[styles.mainImagePlaceholder, { backgroundColor: colors.imagePlaceholder }]}>
-              <Ionicons name="person" size={60} color={colors.textSecondary} />
-            </View>
-          )}
-        </View>
+  const renderViewTab = () => {
+    const imagesWithUri = profileImages.filter(img => img.uri);
 
-        {/* Profile Info */}
-        <View style={styles.profileInfo}>
-          <Text style={[styles.profileName, { color: colors.text }]}>
-            {profileSections.find(s => s.id === 'basic')?.fields.find(f => f.id === 'name')?.value || 'Name'}
-          </Text>
-          <Text style={[styles.profileAge, { color: colors.textSecondary }]}>
-            {profileSections.find(s => s.id === 'basic')?.fields.find(f => f.id === 'age')?.value || 'Age'}
-          </Text>
-          
-          {/* Quick Info */}
-          <View style={styles.quickInfo}>
-            <View style={styles.infoItem}>
-              <Ionicons name="briefcase" size={16} color={colors.primary} />
-              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-                {profileSections.find(s => s.id === 'basic')?.fields.find(f => f.id === 'occupation')?.value || 'Occupation'}
+    const imagesArray = imagesWithUri.map(i => ({ uri: i.uri }));
+
+    const openViewerAt = (index: number) => {
+      setViewerIndex(index);
+      setIsViewerVisible(true);
+    };
+
+    const renderProfileImage = (index: number) => {
+      if (!imagesWithUri[index]) return null;
+      return (
+        <TouchableOpacity activeOpacity={0.9} onPress={() => openViewerAt(index)}>
+          <View style={styles.mainImageContainer}>
+            <Image source={{ uri: imagesWithUri[index].uri }} style={styles.mainImage} />
+          </View>
+        </TouchableOpacity>
+      );
+    };
+
+    const getFieldValue = (sectionId: string, fieldId: string, fallback: string) =>
+      profileSections.find(s => s.id === sectionId)?.fields.find(f => f.id === fieldId)?.value || fallback;
+
+    return (
+      <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false} contentContainerStyle={styles.viewTabContent}>
+        <View style={[styles.profileCard, { backgroundColor: colors.profileCard }]}>
+          {/* First Image */}
+          {renderProfileImage(0)}
+
+          {/* Name + Location, Age, Occupation, Education and About Me */}
+          <View style={styles.profileInfo}>
+            <View style={styles.nameRow}>
+              <Text style={[styles.profileName, { color: colors.text }]} numberOfLines={1}>
+                {getFieldValue('basic', 'name', 'Name')}
               </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Ionicons name="location" size={16} color={colors.primary} />
-              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-                {profileSections.find(s => s.id === 'basic')?.fields.find(f => f.id === 'location')?.value || 'Location'}
-              </Text>
-            </View>
-          </View>
-
-          {/* Bio */}
-          <Text style={[styles.profileBio, { color: colors.text }]}>
-            {profileSections.find(s => s.id === 'about')?.fields.find(f => f.id === 'bio')?.value || 'No bio yet'}
-          </Text>
-
-          {/* Interests */}
-          <View style={styles.interestsContainer}>
-            <Text style={[styles.interestsTitle, { color: colors.textSecondary }]}>
-              Interests
-            </Text>
-            <View style={styles.interestsList}>
-              {(profileSections.find(s => s.id === 'preferences')?.fields.find(f => f.id === 'interests')?.value || '')
-                .split(', ')
-                .slice(0, 3)
-                .map((interest, index) => (
-                  <View key={index} style={[styles.interestTag, { backgroundColor: colors.secondary }]}>
-                    <Text style={[styles.interestText, { color: colors.primary }]}>
-                      {interest}
-                    </Text>
-                  </View>
-                ))}
-            </View>
-          </View>
-
-          {/* Looking For */}
-          <View style={styles.lookingForContainer}>
-            <Text style={[styles.lookingForTitle, { color: colors.textSecondary }]}>
-              Looking for
-            </Text>
-            <Text style={[styles.lookingForText, { color: colors.text }]}>
-              {profileSections.find(s => s.id === 'preferences')?.fields.find(f => f.id === 'looking_for')?.value || 'Not specified'}
-            </Text>
-          </View>
-
-          {/* Lifestyle */}
-          <View style={styles.lifestyleContainer}>
-            <Text style={[styles.lifestyleTitle, { color: colors.textSecondary }]}>
-              Lifestyle
-            </Text>
-            <View style={styles.lifestyleItems}>
-              <View style={styles.lifestyleItem}>
-                <Ionicons name="fitness" size={16} color={colors.primary} />
-                <Text style={[styles.lifestyleText, { color: colors.text }]}>
-                  {profileSections.find(s => s.id === 'lifestyle')?.fields.find(f => f.id === 'gym')?.value || 'Not specified'}
+              <View style={styles.infoItem}>
+                <Ionicons name="location" size={16} color={colors.primary} />
+                <Text style={[styles.infoText, { color: colors.textSecondary }]} numberOfLines={1}>
+                  {getFieldValue('basic', 'location', 'Location')}
                 </Text>
               </View>
             </View>
+            <Text style={[styles.profileAge, { color: colors.textSecondary }]}>
+              {getFieldValue('basic', 'age', 'Age')}
+            </Text>
+
+            <View style={styles.quickInfo}>
+              <View style={styles.infoItem}>
+                <Ionicons name="briefcase" size={16} color={colors.primary} />
+                <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+                  {getFieldValue('basic', 'occupation', 'Occupation')}
+                </Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="school" size={16} color={colors.primary} />
+                <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+                  {getFieldValue('basic', 'education', 'Education')}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={[styles.profileBio, { color: colors.text }]}>
+              {getFieldValue('about', 'bio', 'No bio yet')}
+            </Text>
           </View>
+
+          {/* Second Image */}
+          {renderProfileImage(1)}
+
+          {/* Interests */}
+          <View style={styles.profileInfo}>
+            <View style={styles.interestsContainer}>
+              <Text style={[styles.interestsTitle, { color: colors.textSecondary }]}>Interests</Text>
+              <View style={styles.interestsList}>
+                {getFieldValue('preferences', 'interests', '')
+                  .split(', ')
+                  .filter(Boolean)
+                  .map((interest, index) => (
+                    <View key={`${interest}-${index}`} style={[styles.interestTag, { backgroundColor: colors.secondary }]}> 
+                      <Text style={[styles.interestText, { color: colors.primary }]}>{interest}</Text>
+                    </View>
+                  ))}
+              </View>
+            </View>
+          </View>
+
+          {/* Third Image */}
+          {renderProfileImage(2)}
+
+          {/* Looking for and Deal breakers */}
+          <View style={styles.profileInfo}>
+            <View style={styles.lookingForContainer}>
+              <Text style={[styles.lookingForTitle, { color: colors.textSecondary }]}>Looking for</Text>
+              <Text style={[styles.lookingForText, { color: colors.text }]}>
+                {getFieldValue('preferences', 'looking_for', 'Not specified')}
+              </Text>
+            </View>
+            <View style={styles.lookingForContainer}>
+              <Text style={[styles.lookingForTitle, { color: colors.textSecondary }]}>Deal breakers</Text>
+              <View style={styles.interestsList}>
+                {getFieldValue('preferences', 'deal_breakers', '')
+                  .split(', ')
+                  .filter(Boolean)
+                  .map((breaker, index) => (
+                    <View key={`${breaker}-${index}`} style={[styles.interestTag, { backgroundColor: colors.secondary }]}> 
+                      <Text style={[styles.interestText, { color: colors.primary }]}>{breaker}</Text>
+                    </View>
+                  ))}
+              </View>
+            </View>
+          </View>
+
+          {/* Fourth Image */}
+          {renderProfileImage(3)}
+
+          {/* Lifestyle */}
+          <View style={styles.profileInfo}>
+            <View style={styles.lifestyleContainer}>
+              <Text style={[styles.lifestyleTitle, { color: colors.textSecondary }]}>Lifestyle</Text>
+              <View style={styles.lifestyleItems}>
+                <View style={styles.lifestyleItem}>
+                  <Ionicons name="resize" size={16} color={colors.primary} />
+                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
+                    {getFieldValue('lifestyle', 'height', 'Not specified')}
+                  </Text>
+                </View>
+                <View style={styles.lifestyleItem}>
+                  <Ionicons name="fitness" size={16} color={colors.primary} />
+                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
+                    {getFieldValue('lifestyle', 'gym', 'Not specified')}
+                  </Text>
+                </View>
+                <View style={styles.lifestyleItem}>
+                  <Ionicons name={'cigarette' as any} size={16} color={colors.primary} />
+                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
+                    {getFieldValue('lifestyle', 'smoking', 'Not specified')}
+                  </Text>
+                </View>
+                <View style={styles.lifestyleItem}>
+                  <Ionicons name="wine" size={16} color={colors.primary} />
+                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
+                    {getFieldValue('lifestyle', 'drinking', 'Not specified')}
+                  </Text>
+                </View>
+                <View style={styles.lifestyleItem}>
+                  <Ionicons name={'church' as any} size={16} color={colors.primary} />
+                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
+                    {getFieldValue('lifestyle', 'religion', 'Not specified')}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Fifth Image */}
+          {renderProfileImage(4)}
+          {/* Sixth Image */}
+          {renderProfileImage(5)}
         </View>
-      </View>
-    </ScrollView>
-  );
+
+        {/* Fullscreen viewer */}
+        <ImageViewing
+          images={imagesArray}
+          imageIndex={viewerIndex}
+          visible={isViewerVisible}
+          onRequestClose={() => setIsViewerVisible(false)}
+        />
+      </ScrollView>
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -870,6 +970,12 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     padding: 20,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
   },
   profileName: {
     fontSize: 24,
