@@ -184,28 +184,38 @@ export default function ChatsTab() {
   );
   
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: Colors[colorScheme].background },
+      ]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: Colors[colorScheme].text }]}>
-          Messages
+          Matches
         </Text>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Ionicons 
             name="ellipsis-horizontal" 
             size={24} 
             color={Colors[colorScheme].text} 
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
-      
+
       {/* Search Bar */}
-      <View style={[styles.searchContainer, { backgroundColor: Colors[colorScheme].card }]}>
-        <Ionicons 
-          name="search" 
-          size={20} 
-          color={Colors[colorScheme].textTertiary} 
-          style={styles.searchIcon} 
+      {/* <View
+        style={[
+          styles.searchContainer,
+          { backgroundColor: Colors[colorScheme].card },
+        ]}
+      >
+        <Ionicons
+          name="search"
+          size={20}
+          color={Colors[colorScheme].textTertiary}
+          style={styles.searchIcon}
         />
         <TextInput
           style={[styles.searchInput, { color: Colors[colorScheme].text }]}
@@ -215,65 +225,82 @@ export default function ChatsTab() {
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-            <Ionicons 
-              name="close-circle" 
-              size={20} 
-              color={Colors[colorScheme].textTertiary} 
+          <TouchableOpacity
+            onPress={() => setSearchQuery("")}
+            style={styles.clearButton}
+          >
+            <Ionicons
+              name="close-circle"
+              size={20}
+              color={Colors[colorScheme].textTertiary}
             />
           </TouchableOpacity>
         )}
-      </View>
-      
+      </View> */}
+
       {/* New Matches Carousel */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}
+          >
             New Matches
           </Text>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Text style={{ color: Colors[colorScheme].primary }}>See All</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
-        
+
         <FlatList
           data={newMatches}
           renderItem={renderNewMatch}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.matchesList}
         />
       </View>
-      
+
       {/* Messages List */}
       <View style={[styles.section, { flex: 1 }]}>
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
+          <Text
+            style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}
+          >
             Messages
           </Text>
         </View>
-        
+
         {filteredChats.length > 0 ? (
           <FlatList
             data={filteredChats}
             renderItem={renderChatItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.chatList}
           />
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons 
-              name="chatbubbles-outline" 
-              size={64} 
-              color={Colors[colorScheme].textTertiary} 
+            <Ionicons
+              name="chatbubbles-outline"
+              size={64}
+              color={Colors[colorScheme].textTertiary}
               style={styles.emptyIcon}
             />
-            <Text style={[styles.emptyText, { color: Colors[colorScheme].textTertiary }]}>
+            <Text
+              style={[
+                styles.emptyText,
+                { color: Colors[colorScheme].textTertiary },
+              ]}
+            >
               No messages found
             </Text>
-            <Text style={[styles.emptySubtext, { color: Colors[colorScheme].textTertiary }]}>
+            <Text
+              style={[
+                styles.emptySubtext,
+                { color: Colors[colorScheme].textTertiary },
+              ]}
+            >
               Start a conversation with your matches
             </Text>
           </View>

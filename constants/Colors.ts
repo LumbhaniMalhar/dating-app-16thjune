@@ -59,6 +59,12 @@ export const Colors = {
     imagePlaceholder: mediumGray,
     deleteButton: dangerRed,
     settingsBackground: lightGray,
+    // Chat specific
+    chatBubbleSelf: primaryBrown,
+    chatBubbleOther: '#FFFFFF',
+    chatBubbleSelfText: '#FFFFFF',
+    chatBubbleOtherText: '#2E1A12',
+    chatTimestamp: '#8D6E63',
   },
   // dark: {
   //   text: '#F5F5F5',
@@ -119,5 +125,11 @@ export const Colors = {
     imagePlaceholder: mediumGray,
     deleteButton: dangerRed,
     settingsBackground: lightGray,
+    // Chat specific
+    chatBubbleSelf: primaryBrown,
+    chatBubbleOther: '#FFFFFF',
+    chatBubbleSelfText: '#FFFFFF',
+    chatBubbleOtherText: '#2E1A12',
+    chatTimestamp: '#8D6E63',
   },
 };

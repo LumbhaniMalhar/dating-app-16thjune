@@ -4,9 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import ImageViewing from 'react-native-image-viewing';
-import BrownButton from '@/components/BrownButton';
 import CustomImagePicker from '@/components/CustomImagePicker';
 import { useRouter } from 'expo-router';
+import ProfileViewCard from '@/components/ProfileViewCard';
 
 const { width } = Dimensions.get('window');
 
@@ -425,173 +425,12 @@ export default function ProfileTab() {
   );
 
   const renderViewTab = () => {
-    const imagesWithUri = profileImages.filter(img => img.uri);
-
-    const imagesArray = imagesWithUri.map(i => ({ uri: i.uri }));
-
-    const openViewerAt = (index: number) => {
-      setViewerIndex(index);
-      setIsViewerVisible(true);
-    };
-
-    const renderProfileImage = (index: number) => {
-      if (!imagesWithUri[index]) return null;
-      return (
-        <TouchableOpacity activeOpacity={0.9} onPress={() => openViewerAt(index)}>
-          <View style={styles.mainImageContainer}>
-            <Image source={{ uri: imagesWithUri[index].uri }} style={styles.mainImage} />
-          </View>
-        </TouchableOpacity>
-      );
-    };
-
-    const getFieldValue = (sectionId: string, fieldId: string, fallback: string) =>
-      profileSections.find(s => s.id === sectionId)?.fields.find(f => f.id === fieldId)?.value || fallback;
+    const imagesWithUri = profileImages.filter(img => img.uri).map(img => img.uri);
+    const sectionsSlim = profileSections.map(s => ({ id: s.id, fields: s.fields.map(f => ({ id: f.id, value: f.value })) }));
 
     return (
       <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false} contentContainerStyle={styles.viewTabContent}>
-        <View style={[styles.profileCard, { backgroundColor: colors.profileCard }]}>
-          {/* First Image */}
-          {renderProfileImage(0)}
-
-          {/* Name + Location, Age, Occupation, Education and About Me */}
-          <View style={styles.profileInfo}>
-            <View style={styles.nameRow}>
-              <Text style={[styles.profileName, { color: colors.text }]} numberOfLines={1}>
-                {getFieldValue('basic', 'name', 'Name')}
-              </Text>
-              <View style={styles.infoItem}>
-                <Ionicons name="location" size={16} color={colors.primary} />
-                <Text style={[styles.infoText, { color: colors.textSecondary }]} numberOfLines={1}>
-                  {getFieldValue('basic', 'location', 'Location')}
-                </Text>
-              </View>
-            </View>
-            <Text style={[styles.profileAge, { color: colors.textSecondary }]}>
-              {getFieldValue('basic', 'age', 'Age')}
-            </Text>
-
-            <View style={styles.quickInfo}>
-              <View style={styles.infoItem}>
-                <Ionicons name="briefcase" size={16} color={colors.primary} />
-                <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-                  {getFieldValue('basic', 'occupation', 'Occupation')}
-                </Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="school" size={16} color={colors.primary} />
-                <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-                  {getFieldValue('basic', 'education', 'Education')}
-                </Text>
-              </View>
-            </View>
-
-            <Text style={[styles.profileBio, { color: colors.text }]}>
-              {getFieldValue('about', 'bio', 'No bio yet')}
-            </Text>
-          </View>
-
-          {/* Second Image */}
-          {renderProfileImage(1)}
-
-          {/* Interests */}
-          <View style={styles.profileInfo}>
-            <View style={styles.interestsContainer}>
-              <Text style={[styles.interestsTitle, { color: colors.textSecondary }]}>Interests</Text>
-              <View style={styles.interestsList}>
-                {getFieldValue('preferences', 'interests', '')
-                  .split(', ')
-                  .filter(Boolean)
-                  .map((interest, index) => (
-                    <View key={`${interest}-${index}`} style={[styles.interestTag, { backgroundColor: colors.secondary }]}> 
-                      <Text style={[styles.interestText, { color: colors.primary }]}>{interest}</Text>
-                    </View>
-                  ))}
-              </View>
-            </View>
-          </View>
-
-          {/* Third Image */}
-          {renderProfileImage(2)}
-
-          {/* Looking for and Deal breakers */}
-          <View style={styles.profileInfo}>
-            <View style={styles.lookingForContainer}>
-              <Text style={[styles.lookingForTitle, { color: colors.textSecondary }]}>Looking for</Text>
-              <Text style={[styles.lookingForText, { color: colors.text }]}>
-                {getFieldValue('preferences', 'looking_for', 'Not specified')}
-              </Text>
-            </View>
-            <View style={styles.lookingForContainer}>
-              <Text style={[styles.lookingForTitle, { color: colors.textSecondary }]}>Deal breakers</Text>
-              <View style={styles.interestsList}>
-                {getFieldValue('preferences', 'deal_breakers', '')
-                  .split(', ')
-                  .filter(Boolean)
-                  .map((breaker, index) => (
-                    <View key={`${breaker}-${index}`} style={[styles.interestTag, { backgroundColor: colors.secondary }]}> 
-                      <Text style={[styles.interestText, { color: colors.primary }]}>{breaker}</Text>
-                    </View>
-                  ))}
-              </View>
-            </View>
-          </View>
-
-          {/* Fourth Image */}
-          {renderProfileImage(3)}
-
-          {/* Lifestyle */}
-          <View style={styles.profileInfo}>
-            <View style={styles.lifestyleContainer}>
-              <Text style={[styles.lifestyleTitle, { color: colors.textSecondary }]}>Lifestyle</Text>
-              <View style={styles.lifestyleItems}>
-                <View style={styles.lifestyleItem}>
-                  <Ionicons name="resize" size={16} color={colors.primary} />
-                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
-                    {getFieldValue('lifestyle', 'height', 'Not specified')}
-                  </Text>
-                </View>
-                <View style={styles.lifestyleItem}>
-                  <Ionicons name="fitness" size={16} color={colors.primary} />
-                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
-                    {getFieldValue('lifestyle', 'gym', 'Not specified')}
-                  </Text>
-                </View>
-                <View style={styles.lifestyleItem}>
-                  <Ionicons name={'cigarette' as any} size={16} color={colors.primary} />
-                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
-                    {getFieldValue('lifestyle', 'smoking', 'Not specified')}
-                  </Text>
-                </View>
-                <View style={styles.lifestyleItem}>
-                  <Ionicons name="wine" size={16} color={colors.primary} />
-                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
-                    {getFieldValue('lifestyle', 'drinking', 'Not specified')}
-                  </Text>
-                </View>
-                <View style={styles.lifestyleItem}>
-                  <Ionicons name={'church' as any} size={16} color={colors.primary} />
-                  <Text style={[styles.lifestyleText, { color: colors.text }]}>
-                    {getFieldValue('lifestyle', 'religion', 'Not specified')}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Fifth Image */}
-          {renderProfileImage(4)}
-          {/* Sixth Image */}
-          {renderProfileImage(5)}
-        </View>
-
-        {/* Fullscreen viewer */}
-        <ImageViewing
-          images={imagesArray}
-          imageIndex={viewerIndex}
-          visible={isViewerVisible}
-          onRequestClose={() => setIsViewerVisible(false)}
-        />
+        <ProfileViewCard images={imagesWithUri} sections={sectionsSlim} />
       </ScrollView>
     );
   };

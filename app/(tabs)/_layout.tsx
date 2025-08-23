@@ -53,51 +53,64 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: COLORS.primary,
-				tabBarInactiveTintColor: COLORS.textHint,
-				tabBarLabelStyle: {
-					fontSize: 12,
-				},
-				tabBarStyle: {
-					backgroundColor: COLORS.surface,
-				},
-      }}>
+        tabBarInactiveTintColor: COLORS.textHint,
+        tabBarLabelStyle: {
+          fontSize: 12,
+        },
+        tabBarStyle: {
+          backgroundColor: COLORS.surface,
+        },
+        // tabBarHideOnKeyboard: true,
+      }}
+    >
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: "Profile",
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="user" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="genie-chat"
         options={{
-          title: 'Genie',
+          title: "Genie",
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Feather name="zap" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="zap" size={size} color={color} />
+          ),
         }}
       />
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="flame.fill" color={color} />,
+          title: "Explore",
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="zap" size={size} color={color} />
+          ),
         }}
-      /> */}
+      />
       <Tabs.Screen
         name="liked-you"
         options={{
-          title: 'Liked You',
+          title: "Liked You",
           headerShown: false,
-					tabBarIcon: ({ color, size }) => <Feather name="heart" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="heart" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="chats"
         options={{
-          title: 'Matches',
+          title: "Matches",
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Feather name="message-circle" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="message-circle" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
