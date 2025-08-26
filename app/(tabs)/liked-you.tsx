@@ -12,8 +12,7 @@ import {
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
+import { Ionicons , Feather } from "@expo/vector-icons";
 import ProfileViewCard, {
   ProfileValueSection,
 } from "@/components/ProfileViewCard";

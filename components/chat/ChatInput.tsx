@@ -28,12 +28,14 @@ export default function ChatInput({ value, onChangeText, onSend, onAttach, place
         {
           backgroundColor: Colors[colorScheme].card,
           borderTopColor: Colors[colorScheme].border,
-          borderTopWidth: showTopBorder ? StyleSheet.hairlineWidth : StyleSheet.hairlineWidth,
-          paddingBottom: Platform.OS === 'ios' ? 8 : 8,
+          borderTopWidth: showTopBorder
+            ? StyleSheet.hairlineWidth
+            : StyleSheet.hairlineWidth,
+          paddingBottom: Platform.OS === "ios" ? 8 : 8,
         },
       ]}
       onLayout={handleLayout}
-    > 
+    >
       <TouchableOpacity onPress={onAttach} style={styles.iconButton}>
         <Ionicons name="add" size={24} color={Colors[colorScheme].icon} />
       </TouchableOpacity>
@@ -58,9 +60,21 @@ export default function ChatInput({ value, onChangeText, onSend, onAttach, place
       <TouchableOpacity
         onPress={onSend}
         disabled={!canSend}
-        style={[styles.sendButton, { backgroundColor: canSend ? Colors[colorScheme].primary : Colors[colorScheme].border, opacity: canSend ? 1 : 0.7 }]}
+        style={[
+          styles.sendButton,
+          {
+            backgroundColor: canSend
+              ? Colors[colorScheme].primary
+              : Colors[colorScheme].border,
+            opacity: canSend ? 1 : 0.7,
+          },
+        ]}
       >
-        <Ionicons name="send" size={18} color={canSend ? '#fff' : Colors[colorScheme].textTertiary} />
+        <Ionicons
+          name="send"
+          size={18}
+          color={canSend ? "#fff" : Colors[colorScheme].textTertiary}
+        />
       </TouchableOpacity>
     </View>
   );

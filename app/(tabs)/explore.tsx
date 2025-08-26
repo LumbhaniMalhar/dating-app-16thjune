@@ -179,55 +179,118 @@ export default function ExploreTab() {
   const next = profiles[index + 1];
 
   return (
-    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? insets.top  : 0 }]}> 
+    <SafeAreaView
+      edges={["top", "bottom"]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+          paddingTop: Platform.OS === "android" ? insets.top : 0,
+        },
+      ]}
+    >
       <View style={styles.deck}>
         {current ? (
           <>
             {next && (
               <Animated.View
+                key={next.id}
                 style={[styles.card, styles.nextCard]}
                 pointerEvents="none"
               >
-                <ProfileViewCard images={next.images} sections={next.sections} showGenieSection genieText={next.genie} />
+                <ProfileViewCard
+                  images={next.images}
+                  sections={next.sections}
+                  showGenieSection
+                  genieText={next.genie}
+                />
               </Animated.View>
             )}
 
             <Animated.View
-              style={[styles.card, { transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }] }]}
+              style={[
+                styles.card,
+                {
+                  transform: [
+                    { translateX: position.x },
+                    { translateY: position.y },
+                    { rotate },
+                  ],
+                },
+              ]}
               {...panResponder.panHandlers}
             >
-            <View style={styles.badgeContainer} pointerEvents="none">
-              <Animated.View style={[styles.badge, styles.likeBadge, { opacity: likeOpacity, borderColor: colors.success }]}>
-                <Text style={[styles.badgeText, { color: colors.success }]}>LIKE</Text>
-              </Animated.View>
-              <Animated.View style={[styles.badge, styles.nopeBadge, { opacity: nopeOpacity, borderColor: colors.error }]}> 
-                <Text style={[styles.badgeText, { color: colors.error }]}>NOPE</Text>
-              </Animated.View>
-            </View>
-            <ScrollView
-              ref={ref => { scrollRef.current = ref; }}
-              key={current.id}
-              style={styles.scrollCard}
-              showsVerticalScrollIndicator={false}
-            >
-              <ProfileViewCard images={current.images} sections={current.sections} showGenieSection genieText={current.genie} />
-            </ScrollView>
+              <View style={styles.badgeContainer} pointerEvents="none">
+                <Animated.View
+                  style={[
+                    styles.badge,
+                    styles.likeBadge,
+                    { opacity: likeOpacity, borderColor: colors.success },
+                  ]}
+                >
+                  <Text style={[styles.badgeText, { color: colors.success }]}>
+                    LIKE
+                  </Text>
+                </Animated.View>
+                <Animated.View
+                  style={[
+                    styles.badge,
+                    styles.nopeBadge,
+                    { opacity: nopeOpacity, borderColor: colors.error },
+                  ]}
+                >
+                  <Text style={[styles.badgeText, { color: colors.error }]}>
+                    NOPE
+                  </Text>
+                </Animated.View>
+              </View>
+              <ScrollView
+                ref={(ref) => {
+                  scrollRef.current = ref;
+                }}
+                key={current.id}
+                style={styles.scrollCard}
+                showsVerticalScrollIndicator={false}
+              >
+                <ProfileViewCard
+                  images={current.images}
+                  sections={current.sections}
+                  showGenieSection
+                  genieText={current.genie}
+                />
+              </ScrollView>
             </Animated.View>
           </>
         ) : (
           <View style={styles.emptyState}>
             <Feather name="check-circle" size={56} color={colors.primary} />
             <Text style={styles.emptyTitle}>You're all caught up</Text>
-            <Text style={styles.emptySubtitle}>Check back later for more recommendations</Text>
+            <Text style={styles.emptySubtitle}>
+              Check back later for more recommendations
+            </Text>
           </View>
         )}
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={[styles.actionButton, styles.dislikeButton, { borderColor: colors.primary }]} onPress={() => forceSwipe('left')}>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            styles.dislikeButton,
+            { borderColor: colors.primary },
+          ]}
+          onPress={() => forceSwipe("left")}
+        >
           <Feather name="x" size={28} color={colors.primary} />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, styles.likeButton, { backgroundColor: colors.primary }]} onPress={() => forceSwipe('right')}>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            styles.likeButton,
+            { backgroundColor: colors.primary },
+          ]}
+          onPress={() => forceSwipe("right")}
+        >
           <Feather name="heart" size={28} color={colors.buttonText} />
         </TouchableOpacity>
       </View>

@@ -1,81 +1,104 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  Image, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  TextInput,
-  ScrollView,
-  Animated
-} from 'react-native';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  SafeAreaView,
+  Animated,
+} from "react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 // Mock data for chats and new matches
 const chatData = [
   {
-    id: '1',
-    userId: '101',
-    name: 'Alex',
-    lastMessage: 'Hey there! How are you doing today?',
-    time: '10:30 AM',
+    id: "1",
+    userId: "101",
+    name: "Alex",
+    lastMessage: "Hey there! How are you doing today?",
+    time: "10:30 AM",
     unreadCount: 2,
     isOnline: true,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000',
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000",
   },
   {
-    id: '2',
-    userId: '102',
-    name: 'Jordan',
-    lastMessage: 'Sounds like a plan!',
-    time: 'Yesterday',
+    id: "2",
+    userId: "102",
+    name: "Jordan",
+    lastMessage: "Sounds like a plan!",
+    time: "Yesterday",
     unreadCount: 0,
     isOnline: false,
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000',
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000",
   },
   {
-    id: '3',
-    userId: '103',
-    name: 'Taylor',
-    lastMessage: 'The new coffee shop is amazing!',
-    time: 'Yesterday',
+    id: "3",
+    userId: "103",
+    name: "Taylor",
+    lastMessage: "The new coffee shop is amazing!",
+    time: "Yesterday",
     unreadCount: 0,
     isOnline: true,
-    avatar: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=1000',
+    avatar:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=1000",
   },
   {
-    id: '4',
-    userId: '104',
-    name: 'Casey',
-    lastMessage: 'Can\'t wait for our date!',
-    time: '7/30/23',
+    id: "4",
+    userId: "104",
+    name: "Casey",
+    lastMessage: "Can't wait for our date!",
+    time: "7/30/23",
     unreadCount: 0,
     isOnline: false,
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000',
+    avatar:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000",
   },
 ];
 
 const newMatches = [
-  { id: '201', name: 'Riley', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-  { id: '202', name: 'Morgan', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-  { id: '203', name: 'Avery', avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
-  { id: '204', name: 'Quinn', avatar: 'https://randomuser.me/api/portraits/men/75.jpg' },
-  { id: '205', name: 'Skyler', avatar: 'https://randomuser.me/api/portraits/women/33.jpg' },
+  {
+    id: "201",
+    name: "Riley",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+  {
+    id: "202",
+    name: "Morgan",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    id: "203",
+    name: "Avery",
+    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+  },
+  {
+    id: "204",
+    name: "Quinn",
+    avatar: "https://randomuser.me/api/portraits/men/75.jpg",
+  },
+  {
+    id: "205",
+    name: "Skyler",
+    avatar: "https://randomuser.me/api/portraits/women/33.jpg",
+  },
 ];
 
 type ChatItemProps = {
-  item: typeof chatData[0];
+  item: (typeof chatData)[0];
   onPress: (id: string) => void;
 };
 
 const ChatItem = ({ item, onPress }: ChatItemProps) => {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() ?? "light";
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  
+
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -83,56 +106,70 @@ const ChatItem = ({ item, onPress }: ChatItemProps) => {
       useNativeDriver: true,
     }).start();
   }, []);
-  
+
   return (
     <Animated.View style={{ opacity: fadeAnim }}>
-      <TouchableOpacity 
-        style={[styles.chatItem, { 
-          backgroundColor: item.unreadCount > 0 
-            ? Colors[colorScheme].secondary + '20' 
-            : 'transparent' 
-        }]}
+      <TouchableOpacity
+        style={[
+          styles.chatItem,
+          {
+            backgroundColor:
+              item.unreadCount > 0
+                ? Colors[colorScheme].secondary + "20"
+                : "transparent",
+          },
+        ]}
         onPress={() => onPress(item.id)}
         activeOpacity={0.7}
       >
         <View style={styles.avatarContainer}>
-          <Image 
-            source={{ uri: item.avatar }} 
-            style={styles.avatar} 
-          />
+          <Image source={{ uri: item.avatar }} style={styles.avatar} />
           {item.isOnline && <View style={styles.onlineIndicator} />}
         </View>
-        
+
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
-            <Text style={[styles.chatName, { color: Colors[colorScheme].text }]}>
+            <Text
+              style={[styles.chatName, { color: Colors[colorScheme].text }]}
+            >
               {item.name}
             </Text>
-            <Text style={[styles.chatTime, { color: Colors[colorScheme].textTertiary }]}>
+            <Text
+              style={[
+                styles.chatTime,
+                { color: Colors[colorScheme].textTertiary },
+              ]}
+            >
               {item.time}
             </Text>
           </View>
-          
+
           <View style={styles.chatPreview}>
-            <Text 
+            <Text
               style={[
-                styles.chatMessage, 
-                { 
-                  color: item.unreadCount > 0 
-                    ? Colors[colorScheme].text 
-                    : Colors[colorScheme].textTertiary,
-                  fontWeight: item.unreadCount > 0 ? '600' : '400'
-                }
+                styles.chatMessage,
+                {
+                  color:
+                    item.unreadCount > 0
+                      ? Colors[colorScheme].text
+                      : Colors[colorScheme].textTertiary,
+                  fontWeight: item.unreadCount > 0 ? "600" : "400",
+                },
               ]}
               numberOfLines={1}
             >
               {item.lastMessage}
             </Text>
-            
+
             {item.unreadCount > 0 && (
-              <View style={[styles.unreadBadge, { backgroundColor: Colors[colorScheme].primary }]}>
+              <View
+                style={[
+                  styles.unreadBadge,
+                  { backgroundColor: Colors[colorScheme].primary },
+                ]}
+              >
                 <Text style={styles.unreadCount}>
-                  {item.unreadCount > 9 ? '9+' : item.unreadCount}
+                  {item.unreadCount > 9 ? "9+" : item.unreadCount}
                 </Text>
               </View>
             )}
@@ -143,19 +180,34 @@ const ChatItem = ({ item, onPress }: ChatItemProps) => {
   );
 };
 
-const NewMatchItem = ({ item }: { item: typeof newMatches[0] }) => {
-  const colorScheme = useColorScheme() ?? 'light';
-  
+const NewMatchItem = ({
+  item,
+  onPress,
+}: {
+  item: (typeof newMatches)[0];
+  onPress: (id: string) => void;
+}) => {
+  const colorScheme = useColorScheme() ?? "light";
+
   return (
-    <TouchableOpacity style={styles.matchItem} activeOpacity={0.8}>
+    <TouchableOpacity
+      style={styles.matchItem}
+      activeOpacity={0.8}
+      onPress={() => onPress(item.id)}
+    >
       <View style={styles.matchAvatarContainer}>
-        <Image 
-          source={{ uri: item.avatar }} 
-          style={styles.matchAvatar} 
+        <Image source={{ uri: item.avatar }} style={styles.matchAvatar} />
+        <View
+          style={[
+            styles.onlineIndicator,
+            { borderColor: Colors[colorScheme].background },
+          ]}
         />
-        <View style={[styles.onlineIndicator, { borderColor: Colors[colorScheme].background }]} />
       </View>
-      <Text style={[styles.matchName, { color: Colors[colorScheme].text }]} numberOfLines={1}>
+      <Text
+        style={[styles.matchName, { color: Colors[colorScheme].text }]}
+        numberOfLines={1}
+      >
         {item.name}
       </Text>
     </TouchableOpacity>
@@ -163,26 +215,32 @@ const NewMatchItem = ({ item }: { item: typeof newMatches[0] }) => {
 };
 
 export default function ChatsTab() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const [searchQuery, setSearchQuery] = useState('');
-  const filteredChats = chatData.filter(chat => 
-    chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
+  const colorScheme = useColorScheme() ?? "light";
+  const router = useRouter();
+  const filteredChats = chatData;
+
   const handleChatPress = (chatId: string) => {
-    // In a real app, this would navigate to the chat screen
-    console.log('Chat pressed:', chatId);
+    // Find the chat item to get the userId
+    const chat = chatData.find((c) => c.id === chatId);
+    if (chat) {
+      // Navigate to the chat screen using userId, not chatId
+      router.push(`/chat/${chat.userId}`);
+    }
   };
-  
-  const renderChatItem = ({ item }: { item: typeof chatData[0] }) => (
+
+  const handleNewMatchPress = (matchId: string) => {
+    // Navigate to the new match screen
+    router.push(`/match/${matchId}`);
+  };
+
+  const renderChatItem = ({ item }: { item: (typeof chatData)[0] }) => (
     <ChatItem item={item} onPress={handleChatPress} />
   );
-  
-  const renderNewMatch = ({ item }: { item: typeof newMatches[0] }) => (
-    <NewMatchItem item={item} />
+
+  const renderNewMatch = ({ item }: { item: (typeof newMatches)[0] }) => (
+    <NewMatchItem item={item} onPress={handleNewMatchPress} />
   );
-  
+
   return (
     <SafeAreaView
       style={[
@@ -315,20 +373,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 12,
@@ -340,7 +398,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: '100%',
+    height: "100%",
     fontSize: 16,
   },
   clearButton: {
@@ -350,27 +408,27 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   matchesList: {
     paddingHorizontal: 16,
     paddingBottom: 4,
   },
   matchItem: {
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 20,
     width: 80,
   },
   matchAvatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 8,
   },
   matchAvatar: {
@@ -378,26 +436,26 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 35,
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: "#FF6B6B",
   },
   matchName: {
     fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
+    fontWeight: "500",
+    textAlign: "center",
   },
   chatList: {
     paddingHorizontal: 16,
   },
   chatItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderRadius: 12,
     marginBottom: 8,
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginRight: 16,
   },
   avatar: {
@@ -406,34 +464,34 @@ const styles = StyleSheet.create({
     borderRadius: 28,
   },
   onlineIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 2,
     right: 2,
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#4CD964',
+    backgroundColor: "#4CD964",
     borderWidth: 2,
-    borderColor: 'white',
+    borderColor: "white",
   },
   chatContent: {
     flex: 1,
   },
   chatHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 4,
   },
   chatName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   chatTime: {
     fontSize: 12,
   },
   chatPreview: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   chatMessage: {
     flex: 1,
@@ -444,18 +502,18 @@ const styles = StyleSheet.create({
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   unreadCount: {
-    color: 'white',
+    color: "white",
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 40,
   },
   emptyIcon: {
@@ -464,13 +522,13 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   emptySubtext: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.7,
   },
 });

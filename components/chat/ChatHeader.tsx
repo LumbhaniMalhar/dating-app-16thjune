@@ -15,18 +15,36 @@ export default function ChatHeader({ title, subtitle, onPressMore, leftAvatar }:
   const colorScheme = useColorScheme() ?? 'light';
 
   return (
-    <View style={[styles.container, { borderBottomColor: Colors[colorScheme].border }]}> 
+    <View
+      style={[
+        styles.container,
+        { borderBottomColor: Colors[colorScheme].border },
+      ]}
+    >
       <View style={styles.leftRow}>
-        {leftAvatar ? <View style={[styles.avatar, { backgroundColor: Colors[colorScheme].primary }]}>{leftAvatar}</View> : null}
+        {leftAvatar ? <View style={styles.avatar}>{leftAvatar}</View> : null}
         <View>
-          <Text style={[styles.title, { color: Colors[colorScheme].text }]}>{title}</Text>
+          <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
+            {title}
+          </Text>
           {subtitle ? (
-            <Text style={[styles.subtitle, { color: Colors[colorScheme].textTertiary }]}>{subtitle}</Text>
+            <Text
+              style={[
+                styles.subtitle,
+                { color: Colors[colorScheme].textTertiary },
+              ]}
+            >
+              {subtitle}
+            </Text>
           ) : null}
         </View>
       </View>
       <TouchableOpacity onPress={onPressMore}>
-        <Ionicons name="ellipsis-vertical" size={20} color={Colors[colorScheme].icon} />
+        <Ionicons
+          name="ellipsis-vertical"
+          size={20}
+          color={Colors[colorScheme].icon}
+        />
       </TouchableOpacity>
     </View>
   );
